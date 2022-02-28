@@ -1,41 +1,95 @@
-#
-# This is a Shiny web application. You can run the application by clicking
-# the 'Run App' button above.
-#
-# Find out more about building applications with Shiny here:
-#
-#    http://shiny.rstudio.com/
-#
+require(shiny)
+require(tidyverse)
+require(tidytext)
+require(httr)
+require(rdrop2)
 
-library(shiny)
-
-# Define UI for application that draws a histogram
 ui <- fluidPage(
-
-    submitButton(text = "Gather Sentiments"),
     
-        textInput("query",NULL,placeholder="Enter search terms here"),
-
-
+        titlePanel("Twitter Sentiment Cannon"),
+        
+        textInput("query",NULL,placeholder="Enter search terms here",
+                  width = "500px"),
         textInput("filters",NULL,placeholder =
-                      "Filtered Words (separate with a semicolon,e.g.'bread,toast'"),
+                      "Filtered Words (separate with a semicolon and space, e.g.'bread; toast')",
+                  width = "500px"),
+        
         
         actionButton("button", "Fire!"),
         
-        plotOutput("histogram"),
+        p(textOutput("tweet_count")),
+        p(textOutput("score")),
+        p(textOutput("average")),
+        p(textOutput("median")),
         
-        downloadLink("full_data",label = "Download Data"),
+        imageOutput("histogram", width = "150px"),
+        imageOutput("topten", width = "150px"),
+        h6("2022 Max Kupperman / Lemna Statistics")
 
-    
 )
 
 server <- function(input, output) {
-        results <- sentiment_cannon(input$query,input$filters)
-        plotted <- renderPlot(results$distribution)
-        output$histogram <- plotted
-        output$full_data <- results
+    
+    observeEvent(input$button, {
         
-    }
+    #Shoot the cannon    
+    write_sentiments(input$query,input$filters)
+        
+    #read sentiment table into a file
+    sentiments <- read_csv("sentiments.csv")
+    
+    #get tweet count
+    tweet_count <- sentiments$tweet_count %>% as.character()
+    word_count <- sentiments$word_count %>% as.character()
+    output$tweet_count <- str_glue("The sentiment cannon has gathered ",
+                                   word_count,
+                                   " emotionally charged words in ",tweet_count,
+                                   " recent tweets.") %>% renderText()
+    
+    #get score
+    score <- sentiments$score %>% as.character()
+    output$score <- str_glue("Total score: ", score) %>%
+        renderText()
+    
+    #get average
+    average_score <- sentiments$average_score %>% as.character()
+    output$average <- str_glue("Average score: ", average_score) %>%
+        renderText()
+    
+    #get median
+    median_score <- sentiments$median %>% as.character()
+    output$median <- str_glue("Median score: ", median_score) %>%
+        renderText()
 
-# Run the application 
+    #Plot the histogram
+    output$histogram <- renderImage({
+        
+        filename <- 'histogram.png'
+                list(src = filename,
+                     contentType = 'image/png',
+                     alt = "Histogram of sentiments",
+                     width = '400%'
+             )
+        
+    }, deleteFile = FALSE)
+    
+    #Plot the top ten
+    output$topten <- renderImage({
+        
+        filename <- 'topten.png'
+        list(src = filename,
+             contentType = 'image/png',
+             alt = "Top ten words",
+             width = '400%'
+        )
+        
+    }, deleteFile = FALSE)
+    
+    })
+    
+        
+}
+
+
 shinyApp(ui = ui, server = server)
+
