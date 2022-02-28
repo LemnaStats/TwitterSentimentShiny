@@ -147,6 +147,8 @@ sentiment_cannon <- function(query,filtered_words){
     names(tweet_table_list) <- c(query)
     sentiment_table_list <- list(results_tibble)
     names(sentiment_table_list) <- c(query)
+    filtered_words <- filtered_words %>% str_split(pattern = ("; "))
+    filtered_words <- filtered_words[[1]]
   
   #core cannon
     tweets <- searchTwitterTextAndTimestamp(query,100)
@@ -177,4 +179,14 @@ sentiment_cannon <- function(query,filtered_words){
   names(master_list) <- c("sentiments","tweets","word lists","distribution","top 10")
   return(master_list)
 }
+
+write_sentiments <- function(query,filters){
+  results <- sentiment_cannon(query,filters)
+  sentimental <- results$sentiments
+  write_csv(sentimental, "sentiments.csv")
+  results$distribution %>% ggsave("histogram.png", plot = .)
+  results$`top 10` %>% ggsave("topten.png", plot = .)
+  
+}
+
 
