@@ -3,13 +3,8 @@ require(tidyverse)
 require(tidytext)
 require(httr)
 
-APIkey <- "N6t47mWc75m3omWuuOK2efWR0"
-APIsecret <- "e6fiNAFrpuuGakbtInoE8v9tdzDilE5zrXgl1tw0ukZxj1gHRx"
-bearer_token <- "AAAAAAAAAAAAAAAAAAAAAMS6XwEAAAAA1D8a4lJWJZP2yVJLEn7r%2Fzsk5m0%3D3n1w2DqpF2HWN9HHHlEGrq56gFx2NHfQsOFlQ2yRXjAyhbBgIp"
-AccessToken <- "128872936-RJp6XvOZNcFQNWAH3TqFfeVEJ0UpUUz6fZOsnKX7"
-AccessSecret <- "LXWfbLPC1OQzY2meoMQERwPioMDIzWJmOhaTiAOxJFLfJ"
-ClientID <- "YWdoVWRlYlpWcTlNNFBfRHFOR086MTpjaQ"
-ClientSecret <- "R481m4n2uw_LIwwoJoF04eTs_FElx-lo4H2eRfoD2rx975Fe-5"
+bearer_token <- "sike"
+
 
 searchTwitterTextAndTimestamp <- function(search_terms,n_results){
   headers = c(
